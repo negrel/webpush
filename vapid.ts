@@ -16,13 +16,14 @@ export async function generateVapidKeys(
   );
 }
 
-export const importVapidKeys = importEcdh;
-
-async function importEcdh(
-  crypto: SubtleCrypto,
+export async function importVapidKeys(
   { publicKey, privateKey }: {
     publicKey: ArrayBuffer;
     privateKey: ArrayBuffer;
+  },
+  { crypto = globalThis.crypto.subtle, extractable = false }: {
+    crypto?: SubtleCrypto;
+    extractable?: boolean;
   },
 ): Promise<CryptoKeyPair> {
   const x = publicKey.slice(1, 32 + 1);
@@ -41,14 +42,14 @@ async function importEcdh(
     publicKey,
     { name: "ECDSA", namedCurve: "P-256" },
     true,
-    [],
+    ["verify"],
   );
 
   const privKey = await crypto.importKey(
     "jwk",
     jwkKey,
     { name: "ECDSA", namedCurve: "P-256" },
-    false,
+    extractable,
     ["sign"],
   );
 
