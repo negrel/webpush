@@ -1,5 +1,9 @@
 # `webpush` - Web Push library for Deno and other web compatible runtime.
 
+`webpush` is a Web Push library
+([RFC 8291](https://www.rfc-editor.org/rfc/rfc8291) and
+[RFC 8292](https://www.rfc-editor.org/rfc/rfc8292)) based on Web APIs.
+
 ## Getting started
 
 ### Building the project
@@ -25,7 +29,7 @@ me at [alexandre@negrel.dev](mailto:alexandre@negrel.dev), open an
 
 Please give a :star: if this project helped you!
 
-[![buy me a coffee](.github/images/bmc-button.png)](https://www.buymeacoffee.com/negrel)
+[![buy me a coffee](https://github.com/negrel/.github/blob/master/.github/images/bmc-button.png?raw=true)](https://www.buymeacoffee.com/negrel)
 
 ## :scroll: License
 
