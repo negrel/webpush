@@ -20,8 +20,8 @@ make tests
 
 ## Contributing
 
-If you want to contribute to `webpush` to add a feature or improve the code contact
-me at [alexandre@negrel.dev](mailto:alexandre@negrel.dev), open an
+If you want to contribute to `webpush` to add a feature or improve the code
+contact me at [alexandre@negrel.dev](mailto:alexandre@negrel.dev), open an
 [issue](https://github.com/negrel/webpush/issues) or make a
 [pull request](https://github.com/negrel/webpush/pulls).
 

@@ -44,7 +44,7 @@ export class ApplicationServer {
       contactInformation: string;
       vapidKeys: CryptoKeyPair;
     },
-  ) {
+  ): Promise<ApplicationServer> {
     const keys = await crypto.generateKey(
       {
         name: "ECDH",
