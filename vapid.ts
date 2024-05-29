@@ -1,3 +1,6 @@
+/**
+ * Output of exportVapidKeys() that can be stored serialized in JSON and stored.
+ */
 export interface ExportedVapidKeys {
   publicKey: JsonWebKey;
   privateKey: JsonWebKey;
@@ -8,6 +11,10 @@ const vapidKeysAlgo = {
   namedCurve: "P-256",
 };
 
+/**
+ * Generates a new pair of VAPID keys.
+ * See https://www.rfc-editor.org/rfc/rfc8292.
+ */
 export async function generateVapidKeys(
   { extractable = false, crypto = globalThis.crypto.subtle }: {
     extractable?: boolean;
@@ -21,6 +28,9 @@ export async function generateVapidKeys(
   );
 }
 
+/**
+ * Import VAPID keys previously exported using exportVapidKeys() (JWK format).
+ */
 export async function importVapidKeys(
   exportedKeys: ExportedVapidKeys,
   { crypto = globalThis.crypto.subtle, extractable = false }: {
@@ -46,6 +56,9 @@ export async function importVapidKeys(
   };
 }
 
+/**
+ * Export VAPID keys in JWK format.
+ */
 export async function exportVapidKeys(
   keys: CryptoKeyPair,
   { crypto = globalThis.crypto.subtle }: { crypto?: SubtleCrypto } = {},
