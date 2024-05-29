@@ -1,0 +1,25 @@
+{
+  "publicKey": {
+    "kty": "EC",
+    "crv": "P-256",
+    "alg": "ES256",
+    "x": "ZHHYTWl6KDRQXoIztkVIpmgfCu1_KiF5_b13L0fwsjc",
+    "y": "HxJjYllRcXTueSy0JfslwZLXgs9IBj2pyYeJ98ah0lw",
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true
+  },
+  "privateKey": {
+    "kty": "EC",
+    "crv": "P-256",
+    "alg": "ES256",
+    "x": "ZHHYTWl6KDRQXoIztkVIpmgfCu1_KiF5_b13L0fwsjc",
+    "y": "HxJjYllRcXTueSy0JfslwZLXgs9IBj2pyYeJ98ah0lw",
+    "d": "IIoggteXc-hIT8Y1nx8Uym9b9KNSFILqh8E6NV4Ufhw",
+    "key_ops": [
+      "sign"
+    ],
+    "ext": true
+  }
+}

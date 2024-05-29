@@ -1,60 +1,57 @@
-import { encodeBase64Url } from "./deps.ts";
+export interface ExportedVapidKeys {
+  publicKey: JsonWebKey;
+  privateKey: JsonWebKey;
+}
+
+const vapidKeysAlgo = {
+  name: "ECDSA",
+  namedCurve: "P-256",
+};
 
 export async function generateVapidKeys(
-  extractable: boolean,
-  subtleCrypto?: SubtleCrypto,
+  { extractable = false, crypto = globalThis.crypto.subtle }: {
+    extractable?: boolean;
+    crypto?: SubtleCrypto;
+  } = {},
 ): Promise<CryptoKeyPair> {
-  const crypto = subtleCrypto ?? globalThis.crypto.subtle;
-
   return await crypto.generateKey(
-    {
-      name: "ECDSA",
-      namedCurve: "P-256",
-    },
+    vapidKeysAlgo,
     extractable,
     ["sign", "verify"],
   );
 }
 
 export async function importVapidKeys(
-  { publicKey, privateKey }: {
-    publicKey: ArrayBuffer;
-    privateKey: ArrayBuffer;
-  },
+  exportedKeys: ExportedVapidKeys,
   { crypto = globalThis.crypto.subtle, extractable = false }: {
     crypto?: SubtleCrypto;
     extractable?: boolean;
-  },
+  } = {},
 ): Promise<CryptoKeyPair> {
-  const x = publicKey.slice(1, 32 + 1);
-  const y = publicKey.slice(32 + 1);
-
-  const jwkKey = {
-    crv: "P-256",
-    d: encodeBase64Url(privateKey),
-    kty: "EC",
-    x: encodeBase64Url(x),
-    y: encodeBase64Url(y),
-  };
-
-  const pubKey = await crypto.importKey(
-    "raw",
-    publicKey,
-    { name: "ECDSA", namedCurve: "P-256" },
-    true,
-    ["verify"],
-  );
-
-  const privKey = await crypto.importKey(
-    "jwk",
-    jwkKey,
-    { name: "ECDSA", namedCurve: "P-256" },
-    extractable,
-    ["sign"],
-  );
-
   return {
-    publicKey: pubKey,
-    privateKey: privKey,
+    publicKey: await crypto.importKey(
+      "jwk",
+      exportedKeys.publicKey,
+      vapidKeysAlgo,
+      true,
+      ["verify"],
+    ),
+    privateKey: await crypto.importKey(
+      "jwk",
+      exportedKeys.privateKey,
+      vapidKeysAlgo,
+      extractable,
+      ["sign"],
+    ),
+  };
+}
+
+export async function exportVapidKeys(
+  keys: CryptoKeyPair,
+  { crypto = globalThis.crypto.subtle }: { crypto?: SubtleCrypto } = {},
+): Promise<ExportedVapidKeys> {
+  return {
+    publicKey: await crypto.exportKey("jwk", keys.publicKey),
+    privateKey: await crypto.exportKey("jwk", keys.privateKey),
   };
 }
