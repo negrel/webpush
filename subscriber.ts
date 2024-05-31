@@ -182,7 +182,10 @@ export enum Urgency {
   High = "high",
 }
 
-interface PushMessageOptions {
+/**
+ * Push message options.
+ */
+export interface PushMessageOptions {
   urgency?: Urgency;
   ttl?: number;
   topic?: string;
