@@ -1,0 +1,104 @@
+import {
+  ecdh,
+  forgeJwt,
+  hkdfSha256Expand,
+  hkdfSha256Extract,
+} from "./crypto_utils.ts";
+import { bytes, decodeBase64Url, ece, encodeBase64Url } from "./deps.ts";
+import { PushSubscriber } from "./subscriber.ts";
+
+const encoder = new TextEncoder();
+
+export async function pushMessage(
+  subscriber: PushSubscriber,
+  { crypto = globalThis.crypto.subtle }: { crypto?: SubtleCrypto },
+) {
+}
+
+/**
+ * pushMessage sends a push message.
+ */
+export async function pushMessage2(
+  crypto: SubtleCrypto,
+  asKeys: CryptoKeyPair,
+  vapidKeys: CryptoKeyPair,
+  sub: PushSubscription,
+  message: ArrayBuffer,
+) {
+  const authSecret = decodeBase64Url(sub.keys.auth);
+  const uaPublic = decodeBase64Url(sub.keys.p256dh);
+  const uaPublicKey = await crypto.importKey(
+    "raw",
+    uaPublic,
+    {
+      "name": "ECDH",
+      namedCurve: "P-256",
+    },
+    true,
+    [],
+  );
+
+  const ecdhSecret = await ecdh(crypto, {
+    privateKey: asKeys.privateKey,
+    publicKey: uaPublicKey,
+  });
+
+  const prkKey = await hkdfSha256Extract(
+    crypto,
+    authSecret.buffer.slice(0),
+    ecdhSecret,
+  );
+
+  const asPublic = new Uint8Array(
+    await crypto.exportKey("raw", asKeys.publicKey),
+  );
+
+  const keyInfo = bytes.concat([
+    encoder.encode("WebPush: info\0"),
+    uaPublic,
+    asPublic,
+  ]);
+
+  const ikm = await hkdfSha256Expand(
+    crypto,
+    prkKey,
+    bytes.concat([keyInfo, ece.ONE_BYTE]),
+    32,
+  );
+
+  const jwt = await forgeJwt(vapidKeys.privateKey, {
+    sub: "mailto:john@example.com",
+    aud: new URL(sub.endpoint).origin,
+    exp: 1716428940,
+  });
+
+  const pubKeyRaw = await crypto.exportKey("raw", vapidKeys.publicKey);
+  console.log(new Uint8Array(pubKeyRaw).at(0));
+  console.log(pubKeyRaw.byteLength);
+
+  const eceRecord = await ece.encrypt(message, ikm, {
+    header: {
+      rs: 4096,
+      keyid: asPublic,
+      salt: decodeBase64Url("gP9-2rLHHqVoXa1oAwrdkw"),
+    },
+  });
+  const reqInit = {
+    method: "POST",
+    headers: {
+      "Content-Length": eceRecord.byteLength,
+      "Content-Encoding": "aes128gcm",
+      "Content-Type": "application/octet-stream",
+      "Urgency": "normal",
+      TTL: "2419200",
+      Authorization: `vapid t=${jwt}, k=${
+        encodeBase64Url(await crypto.exportKey("raw", vapidKeys.publicKey))
+      }`,
+    },
+    body: eceRecord,
+  };
+  console.log(reqInit, encodeBase64Url(eceRecord));
+  const response = await fetch(sub.endpoint, reqInit);
+
+  return response;
+}
