@@ -1,8 +1,15 @@
 # `webpush` - Web Push library for Deno and other web compatible runtime.
 
+![license MIT badge](https://img.shields.io/github/license/negrel/webpush)
+![code size badge](https://img.shields.io/github/languages/code-size/negrel/webpush)
+
 `webpush` is a Web Push library
 ([RFC 8291](https://www.rfc-editor.org/rfc/rfc8291) and
 [RFC 8292](https://www.rfc-editor.org/rfc/rfc8292)) based on Web APIs.
+
+> NOTE: This library hasn't been reviewed by crypto experts and may be unsecure.
+> I've done my best to follow RFC recommandation and I only used primitives
+> provided by the SubtleCrypto API.
 
 ## Getting started
 
