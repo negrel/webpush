@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>WebPush example</title>
+	<script type="module">
+		document.addEventListener('DOMContentLoaded', () => {
+			const subscribeBtn = document.querySelector('#subscribe')
+			const sendSubscriptionBtn = document.querySelector('#send-subscription')
+
+			let subscription = null
+
+			subscribeBtn.addEventListener('click', async () => {
+				subscription = await subscribe()
+				console.log("subscription created!", subscription)
+			})
+
+			sendSubscriptionBtn.addEventListener('click', async () => {
+				if (subscription == null) {
+					console.error("no subscription")
+					return
+				}
+
+				await fetch('/api/subscribe', {
+					method: "POST",
+					body: JSON.stringify(subscription)
+				})
+				console.log("subscription sent!")
+			})
+		})
+
+		function urlBase64ToUint8Array(b64) {
+			const padding = "=".repeat((4 - (b64.length % 4)) % 4);
+			const base64 = (b64 + padding)
+				.replace(/\-/g, "+")
+				.replace(/_/g, "/");
+
+			const rawData = globalThis.atob(base64);
+			const outputArray = new Uint8Array(rawData.length);
+
+			for (let i = 0; i < rawData.length; ++i) {
+				outputArray[i] = rawData.charCodeAt(i);
+			}
+
+			return outputArray;
+		}
+
+
+		async function subscribe() {
+			if (!("serviceWorker" in navigator)) {
+				throw new Error("service worker not supported.");
+			}
+
+			// Fetch VAPID public key.
+			const vapidKey = await fetch("/api/vapid").then((r) => r.json());
+			console.debug("subscribe with vapid key", vapidKey);
+
+			// Register a service worker so we can receive push message event when 
+			// tab is closed.
+			const register = await navigator.serviceWorker.register(
+				"./sw.js",
+				{
+					scope: "/",
+					type: "module",
+				},
+			);
+
+			return new Promise((resolve) => {
+				const onServiceWorkerActive = async () => {
+					// Create a push subscription.
+					const subscription = await register.pushManager.subscribe({
+						userVisibleOnly: true,
+						applicationServerKey: urlBase64ToUint8Array(vapidKey),
+					});
+
+					// Return it.
+					resolve(subscription);
+				};
+
+				// Call onServiceWorkerActive when service worker become active.
+				const sw = register.active ?? register.waiting ?? register.installing;
+				if (sw?.state === "activated") {
+					onServiceWorkerActive();
+				} else if (sw !== null) {
+					sw.onstatechange = () => {
+						if (sw.state === "activated") {
+							onServiceWorkerActive();
+						}
+					};
+				}
+			});
+		}
+	</script>
+</head>
+
+<body>
+	<h1>WebPush example</h1>
+	<p>Open DevTools to see logs in console.</p>
+	<p>First we must create a subscription.</p>
+	<button id="subscribe">Subscribe</button>
+	<p>Then we must send it to application server.</p>
+	<button id="send-subscription">Send subscription</button>
+</body>
+
+</html>
