@@ -4,4 +4,3 @@ self.addEventListener("push", (e) => {
   // See https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
   self.registration.showNotification(data.title, data);
 });
-
