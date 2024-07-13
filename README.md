@@ -13,17 +13,53 @@
 
 ## Getting started
 
-### Building the project
+Before sending Web Push message to a user agent, you need to create VAPID keys
+(see [RFC 8292](https://www.rfc-editor.org/rfc/rfc8292)) to identify your server
+(`Application`) to the `Push Service`:
 
-```shell
-make build
+```
++-------+           +--------------+       +-------------+
+|  UA   |           | Push Service |       | Application |
++-------+           +--------------+       +-------------+
+    |                      |                      |
+    |        Setup         |                      |
+    |<====================>|                      |
+    |           Provide Subscription              |
+    |-------------------------------------------->|
+    |                      |                      |
+    :                      :                      :
+    |                      |     Push Message     |
+    |    Push Message      |<---------------------|
+    |<---------------------|                      |
+    |                      |                      |
 ```
 
-### Running the tests
+Run
+[`generate-vapid-keys`](https://github.com/negrel/webpush/blob/master/cmd/generate-vapid-keys.ts)
+script part of this repository to generate new keys:
 
-```shell
-make tests
+```sh
+# You can use any Web compatible runtime.
+$ deno run https://raw.githubusercontent.com/negrel/webpush/master/cmd/generate-vapid-keys.ts
 ```
+
+Copy the output of the command and save it in `example/vapid.json`. Now you can
+run example server.
+
+```
+$ cd example/
+$ deno run -A ./main.ts
+```
+
+## Dependencies
+
+This library tries its best at keeping the minimum number of dependencies. It
+has no external dependencies except some runtime agnostic `@std/` packages
+maintained by Deno team and [`http-ece`](https://github.com/negrel/http-ece),
+which I maintain.
+
+[`http-ece`](https://github.com/negrel/http-ece) also only depends on `@std/`
+packages.
 
 ## Contributing
 
