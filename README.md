@@ -1,5 +1,6 @@
 # `webpush` - Web Push library for Deno and other web compatible runtime.
 
+![jsr badge](https://jsr.io/badges/@negrel/webpush)
 ![license MIT badge](https://img.shields.io/github/license/negrel/webpush)
 ![code size badge](https://img.shields.io/github/languages/code-size/negrel/webpush)
 
@@ -10,6 +11,8 @@
 > NOTE: This library hasn't been reviewed by crypto experts and may be unsecure.
 > I've done my best to follow RFC recommandation and I only used primitives
 > provided by the SubtleCrypto API.
+
+`webpush` is available on [JSR](https://jsr.io/@negrel/webpush).
 
 ## Getting started
 
@@ -51,15 +54,20 @@ $ cd example/
 $ deno run -A ./main.ts
 ```
 
+Code is commented be sure to read it.
+
+I also wrote an
+[ok-ish blog post about Web Push and this library](https://www.negrel.dev/blog/deno-web-push-notifications/).
+
 ## Dependencies
 
 This library tries its best at keeping the minimum number of dependencies. It
-has no external dependencies except some runtime agnostic `@std/` packages
-maintained by Deno team and [`http-ece`](https://github.com/negrel/http-ece),
-which I maintain.
+has no external dependencies except some runtime agnostic
+[`@std/`](https://jsr.io/@std/) packages maintained by Deno team and
+[`http-ece`](https://github.com/negrel/http-ece), which I maintain.
 
-[`http-ece`](https://github.com/negrel/http-ece) also only depends on `@std/`
-packages.
+[`http-ece`](https://github.com/negrel/http-ece) also only depends on
+[`@std/`](https://jsr.io/@std/) packages.
 
 ## Contributing
 
