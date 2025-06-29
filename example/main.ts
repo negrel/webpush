@@ -1,9 +1,6 @@
 // import * as webpush from "jsr:@negrel/webpush";
 import * as webpush from "../mod.ts";
 
-// Used by HTTP server.
-import { encodeBase64Url } from "jsr:@std/encoding@0.224.0/base64url";
-
 // Put your email here so Push Service admin from Firefox / Google can contact
 // you if there is a problem with your application server.
 const adminEmail = "john@example.com";
@@ -36,12 +33,7 @@ Deno.serve(async (req: Request) => {
 
     case "/api/vapid": {
       // We send public key only!
-      const publicKey = encodeBase64Url(
-        await crypto.subtle.exportKey(
-          "raw",
-          vapidKeys.publicKey,
-        ),
-      );
+      const publicKey = await webpush.exportApplicationServerKey(vapidKeys);
 
       return new Response(JSON.stringify(publicKey), {
         headers: {

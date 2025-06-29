@@ -1,3 +1,5 @@
+import { encodeBase64Url } from "./deps.ts";
+
 /**
  * Output of exportVapidKeys() that can be stored serialized in JSON and stored.
  */
@@ -67,4 +69,16 @@ export async function exportVapidKeys(
     publicKey: await crypto.exportKey("jwk", keys.publicKey),
     privateKey: await crypto.exportKey("jwk", keys.privateKey),
   };
+}
+
+/**
+ * Export application server key (VAPID public key) as an URL encoded base64
+ * string.
+ */
+export async function exportApplicationServerKey(
+  keys: CryptoKeyPair,
+  { crypto = globalThis.crypto.subtle }: { crypto?: SubtleCrypto } = {},
+): Promise<string> {
+  const k = await crypto.exportKey("raw", keys.publicKey);
+  return encodeBase64Url(k);
 }
